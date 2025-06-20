@@ -1,0 +1,74 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DuckDB.NET.Data" Version="1.3.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Microsoft.Spark" Version="2.3.0" />
+    <PackageReference Include="NUnit" Version="4.3.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+    <PackageReference Include="RavenDB.Client" Version="7.0.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-2-4_2.11-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-0_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-1_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-2_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-3_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-4_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-5_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-2-4_2.11-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-0_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-1_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-2_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-3_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-4_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\Rough\.nuget\packages\microsoft.spark\2.3.0\build\netstandard2.0\..\..\jars\microsoft-spark-3-5_2.12-2.3.0.jar" />
+  </ItemGroup>
+
+</Project>
