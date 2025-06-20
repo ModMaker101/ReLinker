@@ -1,32 +1,31 @@
-name: Publish NuGet Package
+name: Build and Publish NuGet Package
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.x'
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore ReLinker/ReLinker.csproj
+    - name: Restore dependencies
+      run: dotnet restore
 
-      - name: Build
-        run: dotnet build ReLinker/ReLinker.csproj --configuration Release
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
 
-      - name: Pack
-        run: dotnet pack ReLinker/ReLinker.csproj --configuration Release --output ./nupkg
+    - name: Pack
+      run: dotnet pack --configuration Release --no-build --output ./nupkg
 
-      - name: List package files
-        run: ls -R ./nupkg
-
-      - name: Push to NuGet
-        run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+    - name: Push to NuGet
+      run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
