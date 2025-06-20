@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
-		<PackageId>RecordLink</PackageId>
+		<PackageId>ReLinker</PackageId>
 		<Version>1.0.0</Version>
 		<Authors>ModMaker101</Authors>
 		<Company>AdvantSystemsLLC</Company>
