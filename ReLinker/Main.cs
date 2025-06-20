@@ -11,7 +11,7 @@ public static class SimpleLogger
         Console.WriteLine($"[ERROR] {DateTime.Now}: {message}");
 }
 
-namespace RecordLink
+namespace ReLinker
 {
     public class Record
     {

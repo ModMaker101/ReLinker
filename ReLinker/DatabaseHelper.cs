@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System;
 
-namespace RecordLink
+namespace ReLinker
 {
     public static class RetryHelper
     {
