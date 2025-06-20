@@ -24,7 +24,7 @@ namespace RecordLink
             Fields = fields;
         }
     }
-
+    //test
     public class FieldComparison
     {
         public string FieldName { get; set; }
