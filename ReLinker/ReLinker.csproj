@@ -9,7 +9,7 @@
 		<Description>Library for record linkage and database loading</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/modmaker101/relinker</RepositoryUrl>
-		<PackageReadmeFilee>README.md</PackageReadmeFilee>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
