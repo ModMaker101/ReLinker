@@ -24,7 +24,7 @@ namespace ReLinker
             Fields = fields;
         }
     }
-    
+
     public class FieldComparison
     {
         public string FieldName { get; set; }
@@ -75,13 +75,16 @@ namespace ReLinker
         }
 
         public static (double[], double[]) EstimateParametersWithEM(
-            List<ScoredPair> scoredPairs,
-            List<SimilarityFunction> functions,
-            int maxIterations = 10)
+     List<ScoredPair> scoredPairs,
+     List<SimilarityFunction> functions,
+     int maxIterations = 20,
+     double convergenceThreshold = 1e-4,
+     double[] fieldWeights = null)
         {
             int n = functions.Count;
             double[] mProbs = Enumerable.Repeat(0.9, n).ToArray();
             double[] uProbs = Enumerable.Repeat(0.1, n).ToArray();
+            fieldWeights ??= Enumerable.Repeat(1.0, n).ToArray();
 
             for (int iter = 0; iter < maxIterations; iter++)
             {
@@ -96,12 +99,12 @@ namespace ReLinker
                     for (int i = 0; i < n; i++)
                         scores[i] = functions[i].Compute(pair.Record1, pair.Record2);
 
-                    double mProb = 1.0;
-                    double uProb = 1.0;
+                    double mProb = 1.0, uProb = 1.0;
                     for (int i = 0; i < n; i++)
                     {
-                        mProb *= mProbs[i] * scores[i] + (1 - mProbs[i]) * (1 - scores[i]);
-                        uProb *= uProbs[i] * scores[i] + (1 - uProbs[i]) * (1 - scores[i]);
+                        double s = scores[i];
+                        mProb *= mProbs[i] * s + (1 - mProbs[i]) * (1 - s);
+                        uProb *= uProbs[i] * s + (1 - uProbs[i]) * (1 - s);
                     }
 
                     double weight = mProb / (mProb + uProb);
@@ -110,27 +113,39 @@ namespace ReLinker
                     {
                         for (int i = 0; i < n; i++)
                         {
-                            mNumerator[i] += weight * scores[i];
-                            uNumerator[i] += (1 - weight) * scores[i];
+                            mNumerator[i] += weight * scores[i] * fieldWeights[i];
+                            uNumerator[i] += (1 - weight) * scores[i] * fieldWeights[i];
                         }
                         mDenominator += weight;
                         uDenominator += (1 - weight);
                     }
                 });
 
+                bool converged = true;
                 for (int i = 0; i < n; i++)
                 {
-                    mProbs[i] = mNumerator[i] / mDenominator;
-                    uProbs[i] = uNumerator[i] / uDenominator;
+                    double newM = mNumerator[i] / (mDenominator + 1e-10);
+                    double newU = uNumerator[i] / (uDenominator + 1e-10);
+
+                    if (Math.Abs(newM - mProbs[i]) > convergenceThreshold ||
+                        Math.Abs(newU - uProbs[i]) > convergenceThreshold)
+                        converged = false;
+
+                    mProbs[i] = newM;
+                    uProbs[i] = newU;
+                }
+
+                if (converged)
+                {
+                    SimpleLogger.Info($"[EM] Converged at iteration {iter + 1}");
+                    break;
                 }
             }
 
             return (mProbs, uProbs);
         }
     }
-}
-
-public class UnionFind
+    public class UnionFind
     {
         private readonly Dictionary<string, string> parent = new();
 
@@ -274,4 +289,4 @@ public class UnionFind
         }
 
     }
-
+}
