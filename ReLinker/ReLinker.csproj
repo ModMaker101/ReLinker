@@ -2,27 +2,19 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<PackageId>ReLinker</PackageId>
+		<PackageId>RecordLink</PackageId>
 		<Version>1.0.0</Version>
 		<Authors>ModMaker101</Authors>
 		<Company>AdvantSystemsLLC</Company>
-		<Description>Record linkage and entity resolution library</Description>
- 		<PackageProjectUrl>https://github.com/ModMaker101/ReLinker</PackageProjectUrl>
- 		<RepositoryUrl>https://github.com/ModMaker101</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
+		<Description>Library for record linkage and database loading</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/modmaker101/relinker</RepositoryUrl>
 	</PropertyGroup>
 
-
 	<ItemGroup>
-    <PackageReference Include="DuckDB.NET.Data" Version="1.3.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="Microsoft.Spark" Version="2.3.0" />
-    <PackageReference Include="NUnit" Version="4.3.2" />
-    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
-    <PackageReference Include="RavenDB.Client" Version="7.0.3" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-  </ItemGroup>
+		<PackageReference Include="DuckDB.NET.Data" Version="1.3.0" />
+		<PackageReference Include="RavenDB.Client" Version="7.0.3" />
+	</ItemGroup>
 
 
 
