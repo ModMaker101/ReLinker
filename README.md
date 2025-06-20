@@ -82,7 +82,7 @@ var clusters = uf.GetClusters(); // Dictionary<string, List<string>>
 
 ## Documentation
 
-For full usage details, configuration options, and API reference, see the [Documentation README](./relinker/docs/README.md).
+For full usage details, configuration options, and API reference, see the [Documentation README](./ReLinker/docs/README.md).
 
 ---
 
