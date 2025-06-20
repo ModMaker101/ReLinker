@@ -22,7 +22,10 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore
-
+      
+    - name: Clean nupkg folder
+      run: rm -rf ./nupkg && mkdir ./nupkg
+    
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
