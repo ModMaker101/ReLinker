@@ -32,6 +32,11 @@ namespace ReLinker
 
     public static class BlockingHelper
     {
+        public static List<BlockingRule> LoadBlockingRulesFromConfig(List<string> fields)
+        {
+            return fields.Select(field => new BlockingRule(field, r => r.Fields.GetValueOrDefault(field, ""))).ToList();
+        }
+
         public static IEnumerable<(Record, Record)> GenerateCandidatePairsInBatches(
             IEnumerable<Record> records,
             List<BlockingRule> rules,

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReLinker", "ReLinker\ReLink
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "relinkertester", "..\..\..\..\relinkertester\relinkertester\relinkertester.csproj", "{A7C53BDB-3E17-CA49-7168-070253E0E8DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tester", "tester\tester.csproj", "{3489EF72-AE60-4DF9-83C3-99E1BDDE4E1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A7C53BDB-3E17-CA49-7168-070253E0E8DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7C53BDB-3E17-CA49-7168-070253E0E8DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7C53BDB-3E17-CA49-7168-070253E0E8DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3489EF72-AE60-4DF9-83C3-99E1BDDE4E1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3489EF72-AE60-4DF9-83C3-99E1BDDE4E1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3489EF72-AE60-4DF9-83C3-99E1BDDE4E1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3489EF72-AE60-4DF9-83C3-99E1BDDE4E1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

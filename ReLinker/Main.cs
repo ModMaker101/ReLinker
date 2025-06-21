@@ -258,6 +258,19 @@ namespace ReLinker
 
             return (matchedWeight / totalWeight1 + matchedWeight / totalWeight2 + (matchedWeight - transpositions / 2.0) / matchedWeight) / 3.0;
         }
+        public static class SimilarityFactory
+        {
+            public static Func<Record, Record, double> Create(string type, string field, Dictionary<string, double> idf)
+            {
+                return type.ToLower() switch
+                {
+                    "levenshtein" => (r1, r2) => Similarity.LevenshteinSimilarity(r1.Fields[field], r2.Fields[field], idf),
+                    "jaro" => (r1, r2) => Similarity.JaroSimilarity(r1.Fields[field], r2.Fields[field], idf),
+                    "tfidf" => (r1, r2) => Similarity.TfIdfSimilarity(r1.Fields[field], r2.Fields[field], idf),
+                    _ => throw new ArgumentException($"Unknown similarity type: {type}")
+                };
+            }
+        }
 
         public static double TfIdfSimilarity(string s1, string s2, Dictionary<string, double> idf)
         {
