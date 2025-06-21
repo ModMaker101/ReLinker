@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<PackageId>ReLinker</PackageId>
-		<Version>1.0.111</Version>
+		<Version>1.1.0</Version>
 		<Authors>ModMaker101</Authors>
 		<Company>AdvantSystemsLLC</Company>
 		<Description>Library for record linkage and database loading</Description>
@@ -26,10 +26,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="icon.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Update="icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 
 
