@@ -511,34 +511,34 @@ public class RecordLinkagePipeline
         try
         {
             // Step 1: Load data
-            SimpleLogger.Info("Loading records from database...");
+            Logger.Info("Loading records from database...");
             var loader = DatabaseLoaderFactory.CreateLoader(dbType, connectionString, query);
             var records = await loader.LoadRecordsAsync();
-            SimpleLogger.Info($"Loaded {records.Count} records");
+            Logger.Info($"Loaded {records.Count} records");
 
             // Step 2: Define blocking and similarity based on your data structure
             var (blockingRules, similarities) = ConfigureForYourDomain(idfDictionary);
 
             // Step 3: Generate pairs
-            SimpleLogger.Info("Generating candidate pairs...");
+            Logger.Info("Generating candidate pairs...");
             var candidatePairs = BlockingHelper.GenerateCandidatePairsInBatches(
                 records, blockingRules, batchSize: 5000).ToList();
-            SimpleLogger.Info($"Generated {candidatePairs.Count} candidate pairs");
+            Logger.Info($"Generated {candidatePairs.Count} candidate pairs");
 
             // Step 4: Score and cluster
-            SimpleLogger.Info("Scoring pairs...");
+            Logger.Info("Scoring pairs...");
             double[] mProbs = Enumerable.Repeat(0.9, similarities.Count).ToArray();
             double[] uProbs = Enumerable.Repeat(0.1, similarities.Count).ToArray();
 
             var scores = MatchScorer.Score(candidatePairs, similarities, mProbs, uProbs);
             
-            SimpleLogger.Info("Refining parameters with EM...");
+            Logger.Info("Refining parameters with EM...");
             var (refinedM, refinedU) = MatchScorer.EstimateParametersWithEM(scores, similarities);
             
             var finalScores = MatchScorer.Score(candidatePairs, similarities, refinedM, refinedU);
 
             // Step 5: Cluster
-            SimpleLogger.Info("Clustering matches...");
+            Logger.Info("Clustering matches...");
             var unionFind = new UnionFind();
             var matchCount = 0;
             
@@ -551,13 +551,13 @@ public class RecordLinkagePipeline
             var clusters = unionFind.GetClusters();
             var duplicateGroups = clusters.Where(c => c.Value.Count > 1).Count();
             
-            SimpleLogger.Info($"Found {matchCount} matches forming {duplicateGroups} duplicate groups");
+            Logger.Info($"Found {matchCount} matches forming {duplicateGroups} duplicate groups");
             
             return clusters;
         }
         catch (Exception ex)
         {
-            SimpleLogger.Error($"Pipeline failed: {ex.Message}");
+            Logger.Error($"Pipeline failed: {ex.Message}");
             throw;
         }
     }

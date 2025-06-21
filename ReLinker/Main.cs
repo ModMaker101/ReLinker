@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-public static class SimpleLogger
+public static class Logger
 {
     public static void Info(string message) =>
         Console.WriteLine($"[INFO] {DateTime.Now}: {message}");
@@ -137,7 +137,7 @@ namespace ReLinker
 
                 if (converged)
                 {
-                    SimpleLogger.Info($"[EM] Converged at iteration {iter + 1}");
+                    Logger.Info($"[EM] Converged at iteration {iter + 1}");
                     break;
                 }
             }
@@ -145,7 +145,7 @@ namespace ReLinker
             return (mProbs, uProbs);
         }
     }
-    public class UnionFind
+    public class DisjointSetForest
     {
         private readonly Dictionary<string, string> parent = new();
 
@@ -156,7 +156,7 @@ namespace ReLinker
             return parent[x];
         }
 
-        public void Union(string x, string y)
+        public void MergeEntities(string x, string y)
         {
             var px = Find(x);
             var py = Find(y);

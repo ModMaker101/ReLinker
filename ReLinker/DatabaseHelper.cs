@@ -1,6 +1,4 @@
-﻿
-using DuckDB.NET.Data;
-using Raven.Client.Documents;
+﻿using Raven.Client.Documents;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
@@ -13,8 +11,6 @@ using MySql.Data.MySqlClient;
 using System.Data.SQLite;
 using Oracle.ManagedDataAccess.Client;
 using FirebirdSql.Data.FirebirdClient;
-using System.Data.Odbc;
-using System.Data.OleDb;
 
 
 namespace ReLinker
@@ -95,11 +91,11 @@ namespace ReLinker
                             throw new NotSupportedException($"Provider '{providerName}' is not supported for auto-registration.");
                     }
 
-                    SimpleLogger.Info($"[GenericDbLoader] Registered provider '{providerName}' automatically.");
+                    Logger.Info($"[GenericDbLoader] Registered provider '{providerName}' automatically.");
                 }
                 catch (Exception ex)
                 {
-                    SimpleLogger.Error($"[GenericDbLoader] Failed to register provider '{providerName}': {ex.Message}");
+                    Logger.Error($"[GenericDbLoader] Failed to register provider '{providerName}': {ex.Message}");
                     throw;
                 }
             }
@@ -131,11 +127,11 @@ namespace ReLinker
                     records.Add(new Record(id, fields));
                 }
 
-                SimpleLogger.Info($"[GenericDbLoader] Loaded {records.Count} records asynchronously.");
+                Logger.Info($"[GenericDbLoader] Loaded {records.Count} records asynchronously.");
             }
             catch (Exception ex)
             {
-                SimpleLogger.Error($"[GenericDbLoader] Error loading records asynchronously: {ex.Message}");
+                Logger.Error($"[GenericDbLoader] Error loading records asynchronously: {ex.Message}");
             }
 
             return records;
@@ -167,7 +163,7 @@ namespace ReLinker
             }
             catch (Exception ex)
             {
-                SimpleLogger.Error($"[GenericDbLoader] Error loading records in batches asynchronously: {ex.Message}");
+                Logger.Error($"[GenericDbLoader] Error loading records in batches asynchronously: {ex.Message}");
                 yield break;
             }
 
@@ -205,11 +201,11 @@ namespace ReLinker
                     records.Add(new Record(id, fields));
                 }
 
-                SimpleLogger.Info($"[GenericDbLoader] Loaded {records.Count} records synchronously.");
+                Logger.Info($"[GenericDbLoader] Loaded {records.Count} records synchronously.");
             }
             catch (Exception ex)
             {
-                SimpleLogger.Error($"[GenericDbLoader] Error loading records synchronously: {ex.Message}");
+                Logger.Error($"[GenericDbLoader] Error loading records synchronously: {ex.Message}");
             }
 
             return records;
@@ -241,13 +237,13 @@ namespace ReLinker
             }
             catch (Exception ex)
             {
-                SimpleLogger.Error($"[GenericDbLoader] Error loading records in paginated batch: {ex.Message}");
+                Logger.Error($"[GenericDbLoader] Error loading records in paginated batch: {ex.Message}");
             }
 
             foreach (var record in batch)
                 yield return record;
 
-            SimpleLogger.Info($"[GenericDbLoader] Yielded {batch.Count} records in paginated batch.");
+            Logger.Info($"[GenericDbLoader] Yielded {batch.Count} records in paginated batch.");
         }
 
 

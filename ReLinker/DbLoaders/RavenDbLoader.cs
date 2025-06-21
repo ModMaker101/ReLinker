@@ -41,11 +41,11 @@ namespace ReLinker
                     string id = doc.Id?.ToString() ?? "-1";
                     records.Add(new Record(id, dict));
                 }
-                SimpleLogger.Info($"[RavenDbLoader] Loaded {records.Count} records.");
+                Logger.Info($"[RavenDbLoader] Loaded {records.Count} records.");
             }
             catch (Exception ex)
             {
-                SimpleLogger.Error($"[RavenDbLoader] Error loading records: {ex.Message}");
+                Logger.Error($"[RavenDbLoader] Error loading records: {ex.Message}");
             }
             return records;
         }
@@ -56,12 +56,12 @@ namespace ReLinker
             {
                 var all = LoadRecords();
                 var batch = all.Skip(startOffset).Take(batchSize).ToList();
-                SimpleLogger.Info($"[RavenDbLoader] Yielded {batch.Count} records in batch.");
+                Logger.Info($"[RavenDbLoader] Yielded {batch.Count} records in batch.");
                 return batch;
             }
             catch (Exception ex)
             {
-                SimpleLogger.Error($"[RavenDbLoader] Error loading records in batch: {ex.Message}");
+                Logger.Error($"[RavenDbLoader] Error loading records in batch: {ex.Message}");
                 return Enumerable.Empty<Record>();
             }
         }

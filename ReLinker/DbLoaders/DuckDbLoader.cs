@@ -35,11 +35,11 @@ namespace ReLinker
                         fields[reader.GetName(i)] = reader[i]?.ToString() ?? "";
                     records.Add(new Record(id, fields));
                 }
-                SimpleLogger.Info($"[DuckDbLoader] Loaded {records.Count} records.");
+                Logger.Info($"[DuckDbLoader] Loaded {records.Count} records.");
             }
             catch (Exception ex)
             {
-                SimpleLogger.Error($"[DuckDbLoader] Error loading records: {ex.Message}");
+                Logger.Error($"[DuckDbLoader] Error loading records: {ex.Message}");
             }
             return records;
         }
@@ -66,12 +66,12 @@ namespace ReLinker
             }
             catch (Exception ex)
             {
-                SimpleLogger.Error($"[DuckDbLoader] Error loading records in batch: {ex.Message}");
+                Logger.Error($"[DuckDbLoader] Error loading records in batch: {ex.Message}");
             }
             foreach (var record in batch)
                 yield return record;
 
-            SimpleLogger.Info($"[DuckDbLoader] Yielded {batch.Count} records in batch.");
+            Logger.Info($"[DuckDbLoader] Yielded {batch.Count} records in batch.");
         }
 
         public async Task<List<Record>> LoadRecordsAsync() => await Task.Run(() => LoadRecords());
