@@ -42,40 +42,47 @@ NuGet\Install-Package ReLinker
 ## Example Usage
 
 ```csharp
-using ReLinker;
-using ReLinker.Similarity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using ReLinker;
 
-// Define records
-var record1 = new Record("1", new Dictionary<string, string> { ["name"] = "Alice Smith" });
-var record2 = new Record("2", new Dictionary<string, string> { ["name"] = "Alicia Smythe" });
+class Program
+{
+    static void Main()
+    {
+        // Sample records
+        var records = new List<Record>
+        {
+            new Record("1", new Dictionary<string, string> { { "name", "Alice Smith" }, { "city", "New York" } }),
+            new Record("2", new Dictionary<string, string> { { "name", "Alicia Smyth" }, { "city", "New York" } }),
+            new Record("3", new Dictionary<string, string> { { "name", "Bob Johnson" }, { "city", "Los Angeles" } })
+        };
 
-// Define similarity functions
-var functions = new List<SimilarityFunction> { new LevenshteinFunction("name") };
+        // Define blocking rules (e.g., block on city)
+        var blockingRules = BlockingHelper.LoadBlockingRulesFromConfig(new List<string> { "city" });
 
-// Define EM-learned m/u probabilities or use estimated values
-double[] mProbs = { 0.9 };
-double[] uProbs = { 0.1 };
+        // Generate candidate pairs
+        var candidatePairs = BlockingHelper.GenerateCandidatePairsInBatches(records, blockingRules, batchSize: 2).ToList();
 
-// Score record pairs
-var scored = MatchScorer.Score(
-    new[] { (record1, record2) },
-    functions,
-    mProbs,
-    uProbs
-);
+        // Define similarity function (e.g., Jaro on name)
+        var idf = new Dictionary<string, double>(); // empty for now
+        var similarityFunc = new SimilarityFunction
+        {
+            FieldName = "name",
+            Compute = Similarity.SimilarityFactory.Create("jaro", "name", idf)
+        };
 
-// Threshold for match acceptance
-double threshold = 3.0;
+        // Score pairs
+        var scored = MatchScorer.Score(candidatePairs, new List<SimilarityFunction> { similarityFunc }, new[] { 0.9 }, new[] { 0.1 });
 
-// Cluster matched records
-var uf = new UnionFind();
-foreach (var pair in scored.Where(p => p.Score > threshold))
-    uf.Union(pair.Record1.Id, pair.Record2.Id);
-
-// Retrieve clusters (optional)
-var clusters = uf.GetClusters(); // Dictionary<string, List<string>>
+        // Output results
+        foreach (var pair in scored)
+        {
+            Console.WriteLine($"{pair.Record1.Id} - {pair.Record2.Id}: Score = {pair.Score:F4}");
+        }
+    }
+}
 ```
 
 ---
