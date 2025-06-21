@@ -21,15 +21,15 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore ./ReLinker/ReLinker/ReLinker.csproj
+      run: dotnet restore ./ReLinker/ReLinker.csproj
       
     - name: Clean nupkg folder
       run: rm -rf ./nupkg && mkdir ./nupkg
     
     - name: Build ReLinker
-      run: dotnet build ./ReLinker/ReLinker/ReLinker.csproj --configuration Release --no-restore
+      run: dotnet build ./ReLinker/ReLinker.csproj --configuration Release --no-restore
 
     - name: Pack ReLinker
-      run: dotnet pack ./ReLinker/ReLinker/ReLinker.csproj --configuration Release --no-build --output ./nupkg
+      run: dotnet pack ./ReLinker/ReLinker.csproj --configuration Release --no-build --output ./nupkg
     - name: Push to NuGet
       run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
