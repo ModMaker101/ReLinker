@@ -1,96 +1,67 @@
-﻿using System;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Raven.Client.Documents;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using ReLinker;
 
-class Program
+namespace RavenUploader
 {
-    static async Task Main()
+    public class User
     {
-        // 1. Load records from a PostgreSQL database
-        var loader = DatabaseLoaderFactory.CreateGenericLoader(
-            "Npgsql", // PostgreSQL provider
-            "Host=localhost;Port=5432;Username=your_user;Password=your_password;Database=your_db", // Update with your credentials
-            "SELECT id, first_name, last_name, phone, email, address FROM customers"
-        );
-
-        var records = await loader.LoadRecordsAsync();
-
-        // 2. Build IDF dictionary
-        var idf = BuildIdfDictionary(records);
-
-        // 3. Define blocking rules
-        var blockingRules = new List<BlockingRule>
-        {
-            new BlockingRule("PhonePrefix", r => r.Fields["phone"][..6]),
-            new BlockingRule("EmailDomain", r => r.Fields["email"].Split('@')[1])
-        };
-
-        // 4. Define similarity functions
-        var similarities = new List<SimilarityFunction>
-        {
-            new SimilarityFunction
-            {
-                FieldName = "FullName",
-                Compute = (r1, r2) =>
-                {
-                    string name1 = $"{r1.Fields["first_name"]} {r1.Fields["last_name"]}";
-                    string name2 = $"{r2.Fields["first_name"]} {r2.Fields["last_name"]}";
-                    return Similarity.JaroSimilarity(name1, name2, idf);
-                }
-            },
-            new SimilarityFunction
-            {
-                FieldName = "Address",
-                Compute = (r1, r2) => Similarity.LevenshteinSimilarity(r1.Fields["address"], r2.Fields["address"], idf)
-            },
-            new SimilarityFunction
-            {
-                FieldName = "Phone",
-                Compute = (r1, r2) => r1.Fields["phone"] == r2.Fields["phone"] ? 1.0 : 0.0
-            }
-        };
-
-        // 5. Generate candidate pairs
-        var pairs = BlockingHelper.GenerateCandidatePairsInBatches(records, blockingRules, 1000).ToList();
-
-        // 6. Score pairs and estimate parameters
-        double[] mProbs = { 0.9, 0.8, 0.95 }, uProbs = { 0.1, 0.1, 0.05 };
-        var initialScores = MatchScorer.Score(pairs, similarities, mProbs, uProbs);
-
-        // 7. Cluster matches
-        double threshold = 1.0;
-        var unionFind = new DisjointSetForest();
-        foreach (var pair in initialScores.Where(p => p.Score > threshold))
-            unionFind.MergeEntities(pair.Record1.Id, pair.Record2.Id);
-
-        var clusters = unionFind.GetClusters();
-        foreach (var cluster in clusters.Values.Where(c => c.Count > 1))
-            Console.WriteLine($"Duplicate group: {string.Join(", ", cluster)}");
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string City { get; set; }
     }
 
-    static Dictionary<string, double> BuildIdfDictionary(List<Record> records)
+    class Program
     {
-        var tokenCounts = new Dictionary<string, int>();
-        int totalDocs = records.Count;
-
-        foreach (var record in records)
+        static async Task Main(string[] args)
         {
-            var tokens = new HashSet<string>(
-                record.Fields.Values.SelectMany(v => v.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries))
-            );
-            foreach (var token in tokens)
+            var host = Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddJsonFile("appsettings.json", optional: false);
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    var configuration = context.Configuration;
+                    services.AddSingleton<IDocumentStore>(provider =>
+                    {
+                        return new DocumentStore
+                        {
+                            Urls = new[] { configuration["Raven:Url"] },
+                            Database = configuration["Raven:Database"]
+                        }.Initialize();
+                    });
+                })
+                .Build();
+
+            var store = host.Services.GetRequiredService<IDocumentStore>();
+
+            using (var session = store.OpenAsyncSession())
             {
-                if (!tokenCounts.ContainsKey(token))
-                    tokenCounts[token] = 0;
-                tokenCounts[token]++;
+                var users = new List<User>
+                {
+                    new User { Name = "Robert Smythe", Email = "robert@example.com", City = "Raleigh" },
+                    new User { Name = "Rob Smyth", Email = "rob@example.com", City = "Raleigh" },
+                    new User { Name = "Alice Johnson", Email = "alice@example.com", City = "Durham" },
+                    new User { Name = "Alicia Jonson", Email = "alicia@example.com", City = "Durham" },
+                    new User { Name = "Bob Smith", Email = "bob@example.com", City = "Raleigh" },
+                    new User { Name = "Bobby Smythe", Email = "bobby@example.com", City = "Raleigh" },
+                    new User { Name = "Robert Smith", Email = "roberts@example.com", City = "Raleigh" }
+                };
+
+                foreach (var user in users)
+                {
+                    await session.StoreAsync(user);
+                }
+
+                await session.SaveChangesAsync();
+                Console.WriteLine("Sample users uploaded to RavenDB.");
             }
         }
-
-        return tokenCounts.ToDictionary(
-            kvp => kvp.Key,
-            kvp => Math.Log((double)totalDocs / (1 + kvp.Value))
-        );
     }
 }

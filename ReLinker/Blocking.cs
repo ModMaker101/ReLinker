@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace ReLinker
 {
@@ -30,14 +31,23 @@ namespace ReLinker
         public Func<Record, Record, double> Compute { get; set; }
     }
 
-    public static class BlockingHelper
+    public class BlockingHelper
     {
-        public static List<BlockingRule> LoadBlockingRulesFromConfig(List<string> fields)
+        private readonly ILogger<BlockingHelper> _logger;
+
+        public BlockingHelper(ILogger<BlockingHelper> logger)
         {
-            return fields.Select(field => new BlockingRule(field, r => r.Fields.GetValueOrDefault(field, ""))).ToList();
+            _logger = logger;
         }
 
-        public static IEnumerable<(Record, Record)> GenerateCandidatePairsInBatches(
+        public List<BlockingRule> LoadBlockingRulesFromConfig(List<string> fields)
+        {
+            var rules = fields.Select(field => new BlockingRule(field, r => r.Fields.GetValueOrDefault(field, ""))).ToList();
+            _logger.LogInformation("Loaded {Count} blocking rules from config.", rules.Count);
+            return rules;
+        }
+
+        public IEnumerable<(Record, Record)> GenerateCandidatePairsInBatches(
             IEnumerable<Record> records,
             List<BlockingRule> rules,
             int batchSize)
@@ -64,10 +74,11 @@ namespace ReLinker
                     }
                 });
 
+                _logger.LogInformation("Generated {Count} candidate pairs in batch starting at index {StartIndex}.", pairs.Count, i);
+
                 foreach (var pair in pairs)
                     yield return pair;
             }
         }
     }
-
 }

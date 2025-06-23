@@ -11,7 +11,7 @@ using MySql.Data.MySqlClient;
 using System.Data.SQLite;
 using Oracle.ManagedDataAccess.Client;
 using FirebirdSql.Data.FirebirdClient;
-
+using Microsoft.Extensions.Logging;
 
 namespace ReLinker
 {
@@ -36,7 +36,7 @@ namespace ReLinker
             }
         }
     }
-    //hello
+
     public interface IDatabaseLoader
     {
         Task<List<Record>> LoadRecordsAsync();
@@ -50,14 +50,15 @@ namespace ReLinker
         private readonly string _providerName;
         private readonly string _connectionString;
         private readonly string _query;
+        private readonly ILogger<GenericDbLoader> _logger;
 
-        public GenericDbLoader(string providerName, string connectionString, string query)
+        public GenericDbLoader(string providerName, string connectionString, string query, ILogger<GenericDbLoader> logger)
         {
             _providerName = providerName;
             _connectionString = connectionString;
             _query = query;
+            _logger = logger;
 
-            // Automatically register known providers if not already registered
             var registered = DbProviderFactories.GetFactoryClasses()
             .Rows.Cast<System.Data.DataRow>()
             .Select(r => r["InvariantName"].ToString())
@@ -91,18 +92,15 @@ namespace ReLinker
                             throw new NotSupportedException($"Provider '{providerName}' is not supported for auto-registration.");
                     }
 
-                    Logger.Info($"[GenericDbLoader] Registered provider '{providerName}' automatically.");
+                    _logger.LogInformation("[GenericDbLoader] Registered provider '{ProviderName}' automatically.", providerName);
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"[GenericDbLoader] Failed to register provider '{providerName}': {ex.Message}");
+                    _logger.LogError(ex, "[GenericDbLoader] Failed to register provider '{ProviderName}': {Message}", providerName, ex.Message);
                     throw;
                 }
             }
         }
-
-
-
 
         public async Task<List<Record>> LoadRecordsAsync()
         {
@@ -127,11 +125,11 @@ namespace ReLinker
                     records.Add(new Record(id, fields));
                 }
 
-                Logger.Info($"[GenericDbLoader] Loaded {records.Count} records asynchronously.");
+                _logger.LogInformation("[GenericDbLoader] Loaded {Count} records asynchronously.", records.Count);
             }
             catch (Exception ex)
             {
-                Logger.Error($"[GenericDbLoader] Error loading records asynchronously: {ex.Message}");
+                _logger.LogError(ex, "[GenericDbLoader] Error loading records asynchronously: {Message}", ex.Message);
             }
 
             return records;
@@ -163,11 +161,10 @@ namespace ReLinker
             }
             catch (Exception ex)
             {
-                Logger.Error($"[GenericDbLoader] Error loading records in batches asynchronously: {ex.Message}");
+                _logger.LogError(ex, "[GenericDbLoader] Error loading records in batches asynchronously: {Message}", ex.Message);
                 yield break;
             }
 
-            // Yield records in batches outside the try-catch
             for (int i = startOffset; i < records.Count; i += batchSize)
             {
                 var batch = records.Skip(i).Take(batchSize);
@@ -201,11 +198,11 @@ namespace ReLinker
                     records.Add(new Record(id, fields));
                 }
 
-                Logger.Info($"[GenericDbLoader] Loaded {records.Count} records synchronously.");
+                _logger.LogInformation("[GenericDbLoader] Loaded {Count} records synchronously.", records.Count);
             }
             catch (Exception ex)
             {
-                Logger.Error($"[GenericDbLoader] Error loading records synchronously: {ex.Message}");
+                _logger.LogError(ex, "[GenericDbLoader] Error loading records synchronously: {Message}", ex.Message);
             }
 
             return records;
@@ -237,33 +234,31 @@ namespace ReLinker
             }
             catch (Exception ex)
             {
-                Logger.Error($"[GenericDbLoader] Error loading records in paginated batch: {ex.Message}");
+                _logger.LogError(ex, "[GenericDbLoader] Error loading records in paginated batch: {Message}", ex.Message);
             }
 
             foreach (var record in batch)
                 yield return record;
 
-            Logger.Info($"[GenericDbLoader] Yielded {batch.Count} records in paginated batch.");
+            _logger.LogInformation("[GenericDbLoader] Yielded {Count} records in paginated batch.", batch.Count);
         }
-
-
-
     }
+
     public static class DatabaseLoaderFactory
     {
-        public static IDatabaseLoader CreateGenericLoader(string providerName, string connectionString, string query)
+        public static IDatabaseLoader CreateGenericLoader(string providerName, string connectionString, string query, ILogger<GenericDbLoader> logger)
         {
-            return new GenericDbLoader(providerName, connectionString, query);
+            return new GenericDbLoader(providerName, connectionString, query, logger);
         }
 
-        public static IDatabaseLoader CreateDuckDbLoader(string connectionString, string query)
+        public static IDatabaseLoader CreateDuckDbLoader(string connectionString, string query, ILogger<DuckDbLoader> logger)
         {
-            return new DuckDbLoader(connectionString, query);
+            return new DuckDbLoader(connectionString, query, logger);
         }
 
-        public static IDatabaseLoader CreateRavenDbLoader(string url, string database, string collection)
+        public static IDatabaseLoader CreateRavenDbLoader(string url, string database, string collection, ILogger<RavenDbLoader> logger)
         {
-            return new RavenDbLoader(url, database, collection);
+            return new RavenDbLoader(url, database, collection, logger);
         }
     }
 }

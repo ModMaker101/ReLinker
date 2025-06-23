@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace ReLinker
 {
@@ -11,12 +12,14 @@ namespace ReLinker
         private readonly string _url;
         private readonly string _database;
         private readonly string _collection;
+        private readonly ILogger<RavenDbLoader> _logger;
 
-        public RavenDbLoader(string url, string database, string collection)
+        public RavenDbLoader(string url, string database, string collection, ILogger<RavenDbLoader> logger)
         {
             _url = url;
             _database = database;
             _collection = collection;
+            _logger = logger;
         }
 
         public List<Record> LoadRecords()
@@ -41,11 +44,11 @@ namespace ReLinker
                     string id = doc.Id?.ToString() ?? "-1";
                     records.Add(new Record(id, dict));
                 }
-                Logger.Info($"[RavenDbLoader] Loaded {records.Count} records.");
+                _logger.LogInformation("[RavenDbLoader] Loaded {Count} records.", records.Count);
             }
             catch (Exception ex)
             {
-                Logger.Error($"[RavenDbLoader] Error loading records: {ex.Message}");
+                _logger.LogError(ex, "[RavenDbLoader] Error loading records: {Message}", ex.Message);
             }
             return records;
         }
@@ -56,12 +59,12 @@ namespace ReLinker
             {
                 var all = LoadRecords();
                 var batch = all.Skip(startOffset).Take(batchSize).ToList();
-                Logger.Info($"[RavenDbLoader] Yielded {batch.Count} records in batch.");
+                _logger.LogInformation("[RavenDbLoader] Yielded {Count} records in batch.", batch.Count);
                 return batch;
             }
             catch (Exception ex)
             {
-                Logger.Error($"[RavenDbLoader] Error loading records in batch: {ex.Message}");
+                _logger.LogError(ex, "[RavenDbLoader] Error loading records in batch: {Message}", ex.Message);
                 return Enumerable.Empty<Record>();
             }
         }

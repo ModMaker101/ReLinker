@@ -1,4 +1,5 @@
 ﻿using DuckDB.NET.Data;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,13 @@ namespace ReLinker
     {
         private readonly string _connectionString;
         private readonly string _query;
+        private readonly ILogger<DuckDbLoader> _logger;
 
-        public DuckDbLoader(string connectionString, string query)
+        public DuckDbLoader(string connectionString, string query, ILogger<DuckDbLoader> logger)
         {
             _connectionString = connectionString;
             _query = query;
+            _logger = logger;
         }
 
         public List<Record> LoadRecords()
@@ -35,11 +38,11 @@ namespace ReLinker
                         fields[reader.GetName(i)] = reader[i]?.ToString() ?? "";
                     records.Add(new Record(id, fields));
                 }
-                Logger.Info($"[DuckDbLoader] Loaded {records.Count} records.");
+                _logger.LogInformation("[DuckDbLoader] Loaded {Count} records.", records.Count);
             }
             catch (Exception ex)
             {
-                Logger.Error($"[DuckDbLoader] Error loading records: {ex.Message}");
+                _logger.LogError(ex, "[DuckDbLoader] Error loading records: {Message}", ex.Message);
             }
             return records;
         }
@@ -66,12 +69,12 @@ namespace ReLinker
             }
             catch (Exception ex)
             {
-                Logger.Error($"[DuckDbLoader] Error loading records in batch: {ex.Message}");
+                _logger.LogError(ex, "[DuckDbLoader] Error loading records in batch: {Message}", ex.Message);
             }
             foreach (var record in batch)
                 yield return record;
 
-            Logger.Info($"[DuckDbLoader] Yielded {batch.Count} records in batch.");
+            _logger.LogInformation("[DuckDbLoader] Yielded {Count} records in batch.", batch.Count);
         }
 
         public async Task<List<Record>> LoadRecordsAsync() => await Task.Run(() => LoadRecords());
