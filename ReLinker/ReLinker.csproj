@@ -26,7 +26,11 @@
 		<PackageReference Include="System.Data.SQLite" Version="1.0.119" />
 	</ItemGroup>
 
-
+	<ItemGroup>
+		<None Update="icon.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 
 
