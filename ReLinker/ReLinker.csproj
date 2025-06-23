@@ -3,14 +3,14 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<PackageId>ReLinker</PackageId>
-		<Version>1.1.14</Version>
+		<Version>1.1.16</Version>
 		<Authors>ModMaker101</Authors>
 		<Company>AdvantSystemsLLC</Company>
 		<Description>Library for record linkage and database loading</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/modmaker101/relinker</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageIcon>./icon.png</PackageIcon>
+		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
