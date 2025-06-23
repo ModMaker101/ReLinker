@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
-namespace ReLinker.Core
+namespace ReLinker
 {
     public class ReLinkerEngine : IReLinker
     {
@@ -70,7 +70,6 @@ namespace ReLinker.Core
             var records = await _loader.LoadRecordsAsync();
             var idToRecord = records.ToDictionary(r => r.Id);
             var clusters = LinkInternal(records, options);
-
             return clusters.Values
                 .Select(cluster => cluster.Select(id => idToRecord[id]).ToList())
                 .ToList();

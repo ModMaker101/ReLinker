@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ReLinker.Core
+namespace ReLinker
 {
     public class ReLinkerOptions
     {

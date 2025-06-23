@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReLinker;
-using ReLinker.Core;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using static Similarity;
 
 class Program
 {

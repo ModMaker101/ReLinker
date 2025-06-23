@@ -63,7 +63,6 @@ namespace ReLinker
                     foreach (var record2 in recordList)
                     {
                         if (string.Compare(record1.Id, record2.Id) >= 0) continue;
-
                         if (rules.Any(rule => rule.RuleFunc(record1) == rule.RuleFunc(record2)))
                         {
                             lock (pairs)
@@ -75,7 +74,6 @@ namespace ReLinker
                 });
 
                 _logger.LogInformation("Generated {Count} candidate pairs in batch starting at index {StartIndex}.", pairs.Count, i);
-
                 foreach (var pair in pairs)
                     yield return pair;
             }

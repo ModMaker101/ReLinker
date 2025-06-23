@@ -73,7 +73,6 @@ namespace ReLinker
             }
             foreach (var record in batch)
                 yield return record;
-
             _logger.LogInformation("[DuckDbLoader] Yielded {Count} records in batch.", batch.Count);
         }
 
