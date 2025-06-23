@@ -27,9 +27,57 @@ namespace ReLinker.Core
             _logger = logger;
         }
 
+        public void ValidateOptions(ReLinkerOptions options)
+        {
+            ReLinkerValidator.ValidateOptions(options);
+        }
+
         public async Task<Dictionary<string, List<string>>> LinkRecordsAsync(ReLinkerOptions options)
         {
+            ValidateOptions(options);
             var records = await _loader.LoadRecordsAsync();
+            return LinkInternal(records, options);
+        }
+
+        public Dictionary<string, List<string>> LinkRecords(ReLinkerOptions options)
+        {
+            ValidateOptions(options);
+            var records = _loader.LoadRecords();
+            return LinkInternal(records, options);
+        }
+
+        public async Task<IEnumerable<(Record, Record)>> GenerateCandidatePairsAsync(ReLinkerOptions options)
+        {
+            var records = await _loader.LoadRecordsAsync();
+            var blockingRules = _blockingHelper.LoadBlockingRulesFromConfig(options.BlockingFields);
+            return _blockingHelper.GenerateCandidatePairsInBatches(records, blockingRules, options.BatchSize);
+        }
+
+        public async Task<List<ScoredPair>> ScoreCandidatePairsAsync(ReLinkerOptions options)
+        {
+            var pairs = await GenerateCandidatePairsAsync(options);
+            return _scorer.Score(pairs, options.SimilarityFunctions, options.MProbs, options.UProbs);
+        }
+
+        public async Task<(double[] mProbs, double[] uProbs)> EstimateParametersAsync(ReLinkerOptions options)
+        {
+            var scoredPairs = await ScoreCandidatePairsAsync(options);
+            return _scorer.EstimateParametersWithEM(scoredPairs, options.SimilarityFunctions);
+        }
+
+        public async Task<List<List<Record>>> LinkRecordsWithDetailsAsync(ReLinkerOptions options)
+        {
+            var records = await _loader.LoadRecordsAsync();
+            var idToRecord = records.ToDictionary(r => r.Id);
+            var clusters = LinkInternal(records, options);
+
+            return clusters.Values
+                .Select(cluster => cluster.Select(id => idToRecord[id]).ToList())
+                .ToList();
+        }
+
+        private Dictionary<string, List<string>> LinkInternal(List<Record> records, ReLinkerOptions options)
+        {
             var blockingRules = _blockingHelper.LoadBlockingRulesFromConfig(options.BlockingFields);
             var candidatePairs = _blockingHelper.GenerateCandidatePairsInBatches(records, blockingRules, options.BatchSize);
             var scoredPairs = _scorer.Score(candidatePairs, options.SimilarityFunctions, options.MProbs, options.UProbs);

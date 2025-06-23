@@ -1,8 +1,9 @@
-﻿using ReLinker;
+﻿using Microsoft.Extensions.Logging;
+using ReLinker;
+using ReLinker.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using Microsoft.Extensions.Logging;
 
 public class Similarity
 {
@@ -150,23 +151,23 @@ public class Similarity
 
     public class SimilarityFactory
     {
-        private readonly Similarity _similarity;
-        public SimilarityFactory(Similarity similarity)
+        private readonly Dictionary<Type, ISimilaritySimularity> _strategies = new();
+
+        public void Register<T>(ISimilaritySimularity strategy) where T : ISimilaritySimularity
         {
-            _similarity = similarity;
+            _strategies[typeof(T)] = strategy;
         }
 
-        public Func<Record, Record, double> Create(string type, string field, Dictionary<string, double> idf)
+        public Func<Record, Record, double> Create<T>(string field, Dictionary<string, double> idf)
+            where T : ISimilaritySimularity
         {
-            return type.ToLower() switch
-            {
-                "levenshtein" => (r1, r2) => _similarity.LevenshteinSimilarity(r1.Fields[field], r2.Fields[field], idf),
-                "jaro" => (r1, r2) => _similarity.JaroSimilarity(r1.Fields[field], r2.Fields[field], idf),
-                "tfidf" => (r1, r2) => _similarity.TfIdfSimilarity(r1.Fields[field], r2.Fields[field], idf),
-                _ => throw new ArgumentException($"Unknown similarity type: {type}")
-            };
+            if (!_strategies.TryGetValue(typeof(T), out var strategy))
+                throw new InvalidOperationException($"Strategy for {typeof(T).Name} not registered.");
+
+            return (r1, r2) => strategy.Compute(r1.Fields[field], r2.Fields[field], idf);
         }
     }
+
 
     private static double GetIdf(string token, Dictionary<string, double> idf)
     {
