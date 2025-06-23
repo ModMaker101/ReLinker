@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<PackageId>ReLinker</PackageId>
-		<Version>1.1.0</Version>
+		<Version>1.1.11</Version>
 		<Authors>ModMaker101</Authors>
 		<Company>AdvantSystemsLLC</Company>
 		<Description>Library for record linkage and database loading</Description>
@@ -17,6 +17,7 @@
 		<PackageReference Include="DuckDB.NET.Data" Version="1.3.0" />
 		<PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.6" />
 		<PackageReference Include="MySql.Data" Version="9.3.0" />
 		<PackageReference Include="Npgsql" Version="9.0.3" />
 		<PackageReference Include="Oracle.ManagedDataAccess" Version="23.8.0" />
@@ -25,12 +26,7 @@
 		<PackageReference Include="System.Data.SQLite" Version="1.0.119" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Update="icon.png">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-	</ItemGroup>
+
 
 
 
