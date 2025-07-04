@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,19 +13,20 @@ namespace ReLinker
         private readonly BlockingHelper _blockingHelper;
         private readonly DisjointSetForest _clusterer;
         private readonly ILogger<ReLinkerEngine> _logger;
+        private Dictionary<string, double> _idfData;
 
         public ReLinkerEngine(
-            IDatabaseLoader loader,
-            MatchScorer scorer,
-            BlockingHelper blockingHelper,
-            DisjointSetForest clusterer,
-            ILogger<ReLinkerEngine> logger)
+             IDatabaseLoader loader,
+             BlockingHelper blockingHelper,
+             DisjointSetForest clusterer,
+             ILogger<ReLinkerEngine> logger,
+             Dictionary<string, double> idfDictionary = null)
         {
             _loader = loader;
-            _scorer = scorer;
             _blockingHelper = blockingHelper;
             _clusterer = clusterer;
             _logger = logger;
+            _idfData = idfDictionary; 
         }
 
         public void ValidateOptions(ReLinkerOptions options)
@@ -74,7 +76,45 @@ namespace ReLinker
                 .Select(cluster => cluster.Select(id => idToRecord[id]).ToList())
                 .ToList();
         }
+        private Dictionary<string, double> CalculateIdf(IEnumerable<Record> records)
+        {
+            var documentFrequency = new Dictionary<string, int>();
+            int totalDocuments = 0;
 
+            foreach (var record in records)
+            {
+                totalDocuments++;
+
+                var uniqueTokensInRecord = new HashSet<string>();
+
+                foreach (var field in record.Fields.Values)
+                {
+                    foreach (var token in Tokenize(field))
+                    {
+                        uniqueTokensInRecord.Add(token);
+                    }
+                }
+
+                foreach (var token in uniqueTokensInRecord)
+                {
+                    documentFrequency[token] = documentFrequency.GetValueOrDefault(token, 0) + 1;
+                }
+            }
+        }
+        /// <summary>
+        /// Helper method to tokenize a string into words
+        /// </summary>
+        /// <param name="text">The text to tokenize</param>
+        /// <returns>an enum of normalized tokns</returns>
+        private IEnumerable<string> Tokenize(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            return text.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        }
         private Dictionary<string, List<string>> LinkInternal(List<Record> records, ReLinkerOptions options)
         {
             var blockingRules = _blockingHelper.LoadBlockingRulesFromConfig(options.BlockingFields);

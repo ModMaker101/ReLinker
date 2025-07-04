@@ -8,13 +8,11 @@ namespace ReLinker
 {
     public class MatchScorer
     {
-        private readonly ILogger<MatchScorer> _logger;
-
-        public MatchScorer(ILogger<MatchScorer> logger)
+        private readonly Dictionary<string, double> _idf;
+        public MatchScorer(Dictionary<string, double> idf)
         {
-            _logger = logger;
+            _idf = idf;
         }
-
         public List<ScoredPair> Score(
             IEnumerable<(Record, Record)> pairs,
             List<SimilarityFunction> functions,
@@ -43,10 +41,6 @@ namespace ReLinker
                     if (numerator > 0 && denominator > 0)
                     {
                         logLikelihoodRatio += Math.Log(numerator / denominator);
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Skipped log-likelihood contribution due to zero denominator or numerator for field index {Index}", i);
                     }
                 }
 
@@ -125,7 +119,6 @@ namespace ReLinker
 
                 if (converged)
                 {
-                    _logger.LogInformation("[EM] Converged at iteration {Iteration}", iter + 1);
                     break;
                 }
             }

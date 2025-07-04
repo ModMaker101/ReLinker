@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReLinker;
+using ReLinker.Similarities;
 
 class Program
 {
@@ -19,7 +20,7 @@ class Program
         services.AddSingleton<SimilarityFactory>(provider =>
         {
             var factory = new SimilarityFactory();
-            factory.Register<LevenshteinSimularity>(provider.GetRequiredService< LevenshteinSimularity>());
+            factory.Register<>(provider.GetRequiredService< LevenshteinSimularity>());
             factory.Register<JaroSimularity>(provider.GetRequiredService<JaroSimularity>());
             factory.Register<TfIdfSimularity>(provider.GetRequiredService<TfIdfSimularity>());
             return factory;
@@ -35,15 +36,15 @@ class Program
         var relinker = serviceProvider.GetRequiredService<IReLinker>();
 
 
-        var idf = new Dictionary<string, double>();
+        var idf = new Dictionary<string, double>();        
 
         var factory = serviceProvider.GetRequiredService<SimilarityFactory>();
         var simFuncs = new List<SimilarityFunction>
-        {
+        {            
             new SimilarityFunction
             {
                 FieldName = "name",
-                Compute = factory.Create<LevenshteinSimularity>("name", idf)
+                Compute = factory.Create<LevenshteinSimularity, JaroSimilarity>("name", idf)
             },
             new SimilarityFunction
             {
@@ -55,7 +56,7 @@ class Program
 
         var options = new ReLinkerOptions
         {
-            BlockingFields = new List<string> { "name", "adress" },
+            BlockingFields = new List<string> { "name", "address" },
             SimilarityFunctions = simFuncs,
             MProbs = new double[] { 0.9, 0.8 },
             UProbs = new double[] { 0.1, 0.2 },
